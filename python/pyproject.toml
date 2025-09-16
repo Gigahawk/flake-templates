@@ -1,0 +1,14 @@
+[project]
+name = "hello"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # Sample dep needing override fixups
+    "psycopg2",
+]
+
+[project.scripts]
+hello-python = "main:main"
+
