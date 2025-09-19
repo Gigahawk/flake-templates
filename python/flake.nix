@@ -42,7 +42,11 @@
       overlay = workspace.mkPyprojectOverlay {
         sourcePreference = "wheel";
       };
+      editableOverlay = workspace.mkEditablePyprojectOverlay {
+        root = "$REPO_ROOT";
+      };
       hacks = pkgs.callPackage pyproject-nix.build.hacks {};
+
       pyprojectOverrides = final: prev: {
         # Example override to fix build
         psycopg2 = prev.psycopg2.overrideAttrs (old: {
@@ -64,43 +68,48 @@
           }
         ).overrideScope (
           lib.composeManyExtensions [
-            pyproject-build-systems.overlays.default
+            pyproject-build-systems.overlays.wheel
             overlay
             pyprojectOverrides
           ]
         );
+
+      editablePythonSet = pythonSet.overrideScope editableOverlay;
+      virtualenv = editablePythonSet.mkVirtualEnv "hello-dev-env" workspace.deps.all;
 
       inherit (pkgs.callPackages pyproject-nix.build.util {}) mkApplication;
     in {
       packages = {
         hello = mkApplication {
           venv =
-            pythonSet.mkVirtualEnv "application-env"
+            pythonSet.mkVirtualEnv "hello-app-env"
             workspace.deps.default;
           package = pythonSet.hello;
         };
         default = self.packages.${system}.hello;
       };
       devShells = {
-        impure = pkgs.mkShell {
+        default = pkgs.mkShell {
           packages = [
-            python
+            virtualenv
             pkgs.uv
+            pkgs.sphinx
           ];
           env =
             {
+              UV_NO_SYNC = "1";
+              UV_PYTHON = editablePythonSet.python.interpreter;
               UV_PYTHON_DOWNLOADS = "never";
-              UV_PYTHON = python.interpreter;
             }
             // lib.optionalAttrs pkgs.stdenv.isLinux {
               LD_LIBRARY_PATH = lib.makeLibraryPath pkgs.pythonManylinuxPackages.manylinux1;
             };
           shellHook = ''
             unset PYTHONPATH
+            export REPO_ROOT=$(git rev-parse --show-toplevel)
+            . ${virtualenv}/bin/activate
           '';
         };
-
-        default = self.devShells.${system}.impure;
       };
     });
 }
