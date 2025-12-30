@@ -22,6 +22,11 @@
         nixpkgs.follows = "nixpkgs";
       };
     };
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
@@ -31,6 +36,7 @@
     pyproject-nix,
     uv2nix,
     pyproject-build-systems,
+    treefmt-nix,
     ...
   }:
     flake-utils.lib.eachDefaultSystem (system: let
@@ -78,6 +84,8 @@
       virtualenv = editablePythonSet.mkVirtualEnv "hello-dev-env" workspace.deps.all;
 
       inherit (pkgs.callPackages pyproject-nix.build.util {}) mkApplication;
+
+      treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
     in {
       packages = {
         hello = mkApplication {
@@ -87,6 +95,10 @@
           package = pythonSet.hello;
         };
         default = self.packages.${system}.hello;
+      };
+      formatter = treefmtEval.config.build.wrapper;
+      checks = {
+        formatting = treefmtEval.config.build.check self;
       };
       devShells = {
         default = pkgs.mkShell {
