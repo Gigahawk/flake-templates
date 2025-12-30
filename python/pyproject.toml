@@ -1,3 +1,7 @@
+[build-system]
+requires = ["uv_build>=0.8.14,<0.9.0"]
+build-backend = "uv_build"
+
 [project]
 name = "hello"
 version = "0.1.0"
@@ -5,14 +9,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    # Sample dep needing override fixups
-    "psycopg2",
+  # Sample dep needing override fixups
+  "psycopg2"
 ]
 
 [project.scripts]
 hello-python = "hello.main:main"
-
-[build-system]
-requires = ["uv_build>=0.8.14,<0.9.0"]
-build-backend = "uv_build"
-
