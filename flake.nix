@@ -11,6 +11,14 @@
           TODO: FILL THIS IN
         '';
       };
+      flake-parts = {
+        path = ./flake-parts;
+        description = "Flake-parts template";
+        welcomeText = ''
+          # Getting started
+          TODO: FILL THIS IN
+        '';
+      };
     };
   };
 }
