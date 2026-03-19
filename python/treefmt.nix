@@ -14,6 +14,7 @@
   # md
   programs.mdformat.enable = true;
 
-  #programs.actionlint.enable = true;
-  #programs.yamlfmt.enable = true;
+  # yml
+  programs.actionlint.enable = true;
+  programs.yamlfmt.enable = true;
 }

@@ -136,6 +136,7 @@
               virtualenv
               pkgs.uv
               pkgs.sphinx
+              pkgs.git
             ];
             env = {
               UV_NO_SYNC = "1";
