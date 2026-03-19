@@ -1,1 +1,1 @@
-from .main import divide
+from .main import divide as divide
