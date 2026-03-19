@@ -15,3 +15,8 @@ dependencies = [
 
 [project.scripts]
 hello-python = "hello.main:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
