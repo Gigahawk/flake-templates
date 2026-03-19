@@ -57,6 +57,33 @@
         hacks = pkgs.callPackage pyproject-nix.build.hacks { };
 
         pyprojectOverrides = final: prev: {
+          # Add tests to package
+          hello = prev.hello.overrideAttrs (old: {
+            passthru = old.passthru // {
+              tests =
+                let
+                  _virtualenv = final.mkVirtualEnv "hello-pytest-env" workspace.deps.all // {
+                    hello = [ "dev" ];
+                  };
+                in
+                (old.tests or { })
+                // {
+                  pytest = pkgs.stdenv.mkDerivation {
+                    name = "${final.hello.name}-pytest";
+                    inherit (final.hello) src;
+                    nativeBuildInputs = [
+                      _virtualenv
+                    ];
+                    dontConfigure = true;
+                    buildPhase = ''
+                      runHook preBuild
+                      pytest
+                      runHook postBuild
+                    '';
+                  };
+                };
+            };
+          });
           # Example override to fix build
           psycopg2 = prev.psycopg2.overrideAttrs (old: {
             buildInputs = (old.buildInputs or [ ]) ++ [
@@ -96,6 +123,7 @@
         formatter = treefmtEval.config.build.wrapper;
         checks = {
           formatting = treefmtEval.config.build.check self;
+          pytest = editablePythonSet.hello.passthru.tests.pytest;
         };
         devShells = {
           default = pkgs.mkShell {
