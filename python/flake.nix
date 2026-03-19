@@ -57,33 +57,6 @@
         hacks = pkgs.callPackage pyproject-nix.build.hacks { };
 
         pyprojectOverrides = final: prev: {
-          # Add tests to package
-          hello = prev.hello.overrideAttrs (old: {
-            passthru = old.passthru // {
-              tests =
-                let
-                  _virtualenv = final.mkVirtualEnv "hello-pytest-env" workspace.deps.all // {
-                    hello = [ "dev" ];
-                  };
-                in
-                (old.tests or { })
-                // {
-                  pytest = pkgs.stdenv.mkDerivation {
-                    name = "${final.hello.name}-pytest";
-                    inherit (final.hello) src;
-                    nativeBuildInputs = [
-                      _virtualenv
-                    ];
-                    dontConfigure = true;
-                    buildPhase = ''
-                      runHook preBuild
-                      pytest
-                      runHook postBuild
-                    '';
-                  };
-                };
-            };
-          });
           # Example override to fix build
           psycopg2 = prev.psycopg2.overrideAttrs (old: {
             buildInputs = (old.buildInputs or [ ]) ++ [
@@ -91,6 +64,37 @@
               pkgs.libpq.pg_config
             ];
           });
+
+          ## TODO: Add tests to package?
+          ## Based on https://pyproject-nix.github.io/uv2nix/patterns/testing.html
+          ## Doesn't seem to work, hello package isn't found
+          #hello = prev.hello.overrideAttrs (old: {
+          #  passthru = old.passthru // {
+          #    tests =
+          #      let
+          #        _virtualenv = final.mkVirtualEnv "hello-pytest-env" workspace.deps.all // {
+          #          hello = [ "dev" ];
+          #        };
+          #      in
+          #      (old.tests or { })
+          #      // {
+          #        pytest = pkgs.stdenv.mkDerivation {
+          #          name = "${final.hello.name}-pytest";
+          #          inherit (final.hello) src;
+          #          nativeBuildInputs = [
+          #            virtualenv
+          #            _virtualenv
+          #          ];
+          #          dontConfigure = true;
+          #          buildPhase = ''
+          #            runHook preBuild
+          #            pytest
+          #            runHook postBuild
+          #          '';
+          #        };
+          #      };
+          #  };
+          #});
         };
 
         pythonSet =
@@ -123,7 +127,8 @@
         formatter = treefmtEval.config.build.wrapper;
         checks = {
           formatting = treefmtEval.config.build.check self;
-          pytest = editablePythonSet.hello.passthru.tests.pytest;
+          # Doesn't seem to work
+          # pytest = editablePythonSet.hello.passthru.tests.pytest;
         };
         devShells = {
           default = pkgs.mkShell {
