@@ -57,13 +57,17 @@
         hacks = pkgs.callPackage pyproject-nix.build.hacks { };
 
         pyprojectOverrides = final: prev: {
-          # Example override to fix build
-          psycopg2 = prev.psycopg2.overrideAttrs (old: {
-            buildInputs = (old.buildInputs or [ ]) ++ [
-              prev.setuptools
-              pkgs.libpq.pg_config
-            ];
-          });
+          # Example overrides to fix build
+          # psycopg2 = prev.psycopg2.overrideAttrs (old: {
+          #   buildInputs = (old.buildInputs or [ ]) ++ [
+          #     prev.setuptools
+          #     pkgs.libpq.pg_config
+          #   ];
+          # });
+          # casadi = hacks.nixpkgsPrebuild {
+          #   from = pkgs.python312Packages.casadi;
+          #   prev = prev.casadi;
+          # };
 
           ## TODO: Add tests to package?
           ## Based on https://pyproject-nix.github.io/uv2nix/patterns/testing.html
