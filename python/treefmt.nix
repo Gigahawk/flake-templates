@@ -2,6 +2,7 @@
 {
   projectRootFile = "flake.nix";
   programs.nixfmt.enable = true;
+  programs.dos2unix.enable = true;
 
   # python
   programs.ruff-check.enable = true;
