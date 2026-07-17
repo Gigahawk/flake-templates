@@ -11,7 +11,11 @@
     };
 
     nixpkgs-esp-dev = {
-      url = "github:mirrexagon/nixpkgs-esp-dev";
+      # Waiting on:
+      # https://github.com/mirrexagon/nixpkgs-esp-dev/pull/131
+      # https://github.com/mirrexagon/nixpkgs-esp-dev/pull/132
+      #url = "github:mirrexagon/nixpkgs-esp-dev";
+      url = "github:Gigahawk/nixpkgs-esp-dev/personal";
     };
   };
 
